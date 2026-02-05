@@ -1,0 +1,254 @@
+:root {
+    --bg: #ffffff;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --card: #f8fafc;
+    --blue: #2563eb;
+}
+
+/* Base reset */
+* {
+    box-sizing: border-box;
+}
+
+/* Popup sizing:
+   - Let nav page auto-size (no empty height).
+   - Prevent the popup itself from scrolling; we control scrolling inside .app only when needed. */
+html {
+    width: 360px;
+    background: var(--bg);
+}
+
+body {
+    margin: 0;
+    width: 360px;
+
+    /* Prevent Chrome popup itself from scrolling */
+    max-height: 600px;      /* Chrome-ish popup max */
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    font: 14px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #111827;
+    background: var(--bg);
+}
+
+/* Header */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    background: #f3f4f6;
+    flex: 0 0 auto;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #111827;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+}
+
+.title {
+    font-weight: 700;
+}
+
+.iconBtn {
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 12px;
+
+    padding: 0px 8px;     /* ⬅ bigger hit area */
+    font-size: 32px;       /* ⬅ bigger gear */
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+/* App container */
+.app {
+    padding: 12px;
+    flex: 1 1 auto;
+    min-height: 0;          /* IMPORTANT: allows flex child to shrink so scroll works correctly */
+    overflow: hidden;       /* default: nav doesn't scroll */
+}
+
+/* Tool/Settings: scroll inside the app only */
+body.view-tool .app,
+body.view-settings .app {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 16px;
+}
+
+
+/* Optional: make the scrollbar less "in your face" on macOS/Chrome */
+body.view-tool .app::-webkit-scrollbar,
+body.view-settings .app::-webkit-scrollbar {
+    width: 10px;
+}
+
+body.view-tool .app::-webkit-scrollbar-thumb,
+body.view-settings .app::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.hRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.linkBtn {
+    border: none;
+    background: none;
+    color: var(--blue);
+    cursor: pointer;
+    padding: 0;
+    font-weight: 600;
+}
+
+.toolBtn {
+    width: 100%;
+    text-align: left;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+}
+
+.toolBtn + .toolBtn {
+    margin-top: 10px;
+}
+
+.label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.input,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    font: inherit;
+}
+
+.row {
+    margin-top: 10px;
+}
+
+.primary {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #1d4ed8;
+    background: var(--blue);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}  
+
+.small {
+    font-size: 12px;
+    color: var(--muted);
+    word-break: break-all;
+}
+
+/* tighten vertical spacing */
+.row {
+    margin-top: 6px;          /* was 10px */
+}
+
+.label {
+    margin-bottom: 4px;       /* was 6px */
+}
+
+/* smaller inputs */
+.input,
+select {
+    padding: 8px;             /* was 10px */
+}
+
+/* reduce card padding */
+.card {
+    padding: 10px;            /* was 12px */
+}
+
+/* slightly smaller buttons */
+.primary {
+    margin-top: 10px;         /* was 12px */
+    padding: 10px;            /* was 12px */
+}
+.toolBtn {
+    padding: 10px;            /* was 12px */
+}
+
+.typeahead {
+    position: relative;
+}
+
+.typeaheadMenu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.typeaheadItem {
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.typeaheadItem:hover {
+    background: #f3f4f6;
+}
+
+.typeaheadMuted {
+    font-size: 12px;
+    color: var(--muted);
+}
