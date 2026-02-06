@@ -28,38 +28,42 @@ export async function renderGenerateCchReturnOutput(container, ctx) {
                 </select>
             </div>
 
-            <div class="row">
-                <label class="label">Return Year</label>
-                <select id="returnYear">
-                    ${years
-                        .map((y) => `<option value="${y}" ${y === nowYear ? "selected" : ""}>${y}</option>`)
-                        .join("")}
-                </select>
-            </div>
-
-            <div class="row">
-                <label class="label">Return Type</label>
-                <select id="returnType">
-                    <option value="I" selected>Individual (I)</option>
-                    <option value="P">Partnership (P)</option>
-                </select>
-            </div>
-
-            <div class="row">
-                <label class="label">Client ID</label>
-                <div class="typeahead">
-                    <input class="input" id="clientId" placeholder="Start typing…" autocomplete="off" />
-                    <div id="clientMenu" class="typeaheadMenu" style="display:none;"></div>
+            <div class="row" style="display:flex; gap:10px;">
+                <div style="flex:0 0 100px;">
+                    <label class="label">Return Year</label>
+                    <select id="returnYear">
+                        ${years
+                            .map((y) => `<option value="${y}" ${y === nowYear ? "selected" : ""}>${y}</option>`)
+                            .join("")}
+                    </select>
+                </div>
+                <div style="flex:1;">
+                    <label class="label">Return Type</label>
+                    <select id="returnType">
+                        <option value="I" selected>Individual (I)</option>
+                        <option value="P">Partnership (P)</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="row">
-                <label class="label">Version (1–100)</label>
-                <input class="input" id="version" type="number" min="1" max="100" step="1" value="1" />
+            <div class="row" style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label class="label">Client ID</label>
+                    <div class="typeahead">
+                        <input class="input" id="clientId" placeholder="Start typing…" autocomplete="off" />
+                        <div id="clientMenu" class="typeaheadMenu" style="display:none;"></div>
+                    </div>
+                </div>
+                <div style="flex:0 0 70px;">
+                    <label class="label">Version</label>
+                    <input class="input" id="version" type="number" min="1" max="100" step="1" value="1" />
+                </div>
             </div>
 
-            <button class="primary" id="btnGo">Generate & Go</button>
-            <button class="toolBtn" id="btnResetTool" style="margin-top:10px;">Reset Tool Settings</button>
+            <div class="row" style="display:flex; gap:10px;">
+                <button class="primary" id="btnGo" style="flex:1; width:auto; margin-top:0;">Generate & Go</button>
+                <button class="toolBtn" id="btnResetTool" style="flex:0 0 70px; width:70px; margin:0;">Reset</button>
+            </div>
 
             <div id="loadingRow" class="small" style="margin-top:10px; display:none;">
                 ⏳ Loading…
