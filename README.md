@@ -14,13 +14,14 @@ navigating APIs, and debugging integrations.
 
 ## Features
 
-### Generate Return Output
+### Generate CCH Return Output
 
 Quickly build and navigate to CCH Gateway return output endpoints.
 
 -   Supports:
-    -   **CCH XML**
-    -   **BlackOre JSON**
+    -   **CCH XML** (raw)
+    -   **BlackOre JSON** (import from CCH XML)
+    -   **CCH JSON** (export structure)
 -   Input-driven Return ID builder:
     -   Return Year
     -   Return Type (Individual / Partnership)
@@ -59,7 +60,7 @@ developer use.
 1.  Clone the repository:
 
     ``` bash
-    git clone https://github.com/<your-org>/bot-dev-tools-helper.git
+    git clone https://github.com/saharalkolombra-bo/bot-dev-tools-helper.git
     ```
 
 2.  Open Chrome and navigate to:
@@ -106,7 +107,7 @@ are intentional.
     ├─ popup.js
     ├─ styles.css
     ├─ tools/
-    │  └─ generate-return-output.js
+    │  └─ generate-cch-return-output.js
     ├─ icons/
     │  └─ *.png
 

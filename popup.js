@@ -1,30 +1,38 @@
-import { renderGenerateReturnOutput } from "./tools/generate-return-output.js";
+import { renderGenerateCchReturnOutput } from "./tools/generate-cch-return-output.js";
+import { renderGenerateBotReturnOutput } from "./tools/generate-bot-return-output.js";
 
 const DEFAULTS = {
   cchGatewayApiBase: "http://localhost:7101",
+  integrationCenterApiBase: "http://localhost:9999",
   entityId: "6889b995442d224445bcccbf"
 };
 
 const KEYS = {
   cchGatewayApiBase: "botDevTools.cchGatewayApiBase",
+  integrationCenterApiBase: "botDevTools.integrationCenterApiBase",
   entityId: "botDevTools.entityId"
 };
 
 // Tools registry (Option A: imported render functions)
 const TOOLS = [
   {
-    id: "generate-return-output",
-    name: "Generate Return Output",
-    render: renderGenerateReturnOutput
+    id: "generate-cch-return-output",
+    name: "Generate CCH Return Output",
+    render: renderGenerateCchReturnOutput
   },
   {
-    id: "coming-soon",
-    name: "Coming Soon..."
+    id: "generate-bot-return-output",
+    name: "Generate BOT Return Output",
+    render: renderGenerateBotReturnOutput
   }
 ];
 
 const app = document.getElementById("app");
 document.getElementById("btnSettings").addEventListener("click", () => navigate("settings"));
+
+// Display version from manifest
+const manifest = chrome.runtime.getManifest();
+document.getElementById("appVersion").textContent = `v${manifest.version}`;
 
 function navigate(view, params = {}) {
   state.view = view;
@@ -36,13 +44,15 @@ const state = { view: "nav", params: {} };
 
 async function getGlobals() {
   const cchGatewayApiBase = (await chrome.storage.local.get(KEYS.cchGatewayApiBase))[KEYS.cchGatewayApiBase] ?? DEFAULTS.cchGatewayApiBase;
+  const integrationCenterApiBase = (await chrome.storage.local.get(KEYS.integrationCenterApiBase))[KEYS.integrationCenterApiBase] ?? DEFAULTS.integrationCenterApiBase;
   const entityId = (await chrome.storage.local.get(KEYS.entityId))[KEYS.entityId] ?? DEFAULTS.entityId;
-  return { cchGatewayApiBase, entityId };
+  return { cchGatewayApiBase, integrationCenterApiBase, entityId };
 }
 
 async function setGlobals(next) {
   await chrome.storage.local.set({
     [KEYS.cchGatewayApiBase]: next.cchGatewayApiBase,
+    [KEYS.integrationCenterApiBase]: next.integrationCenterApiBase,
     [KEYS.entityId]: next.entityId
   });
 }
@@ -82,6 +92,11 @@ async function renderSettings() {
       </div>
 
       <div class="row">
+        <label class="label">Integration Center API Base Path</label>
+        <input class="input" id="integrationCenterApiBase" value="${escapeHtml(globals.integrationCenterApiBase)}" />
+      </div>
+
+      <div class="row">
         <label class="label">Entity ID</label>
         <input class="input" id="entityId" value="${escapeHtml(globals.entityId)}" />
       </div>
@@ -99,8 +114,9 @@ async function renderSettings() {
 
   document.getElementById("btnSave").onclick = async () => {
     const cchGatewayApiBase = document.getElementById("cchGatewayApiBase").value.trim() || DEFAULTS.cchGatewayApiBase;
+    const integrationCenterApiBase = document.getElementById("integrationCenterApiBase").value.trim() || DEFAULTS.integrationCenterApiBase;
     const entityId = document.getElementById("entityId").value.trim();
-    await setGlobals({ cchGatewayApiBase, entityId });
+    await setGlobals({ cchGatewayApiBase, integrationCenterApiBase, entityId });
     navigate("nav");
   };
 

@@ -67,6 +67,12 @@ body {
     font-weight: 700;
 }
 
+.version {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+}
+
 .iconBtn {
     border: 1px solid var(--border);
     background: white;
@@ -148,6 +154,10 @@ body.view-settings .app::-webkit-scrollbar-thumb {
     margin-top: 10px;
 }
 
+.toolBtn:hover {
+    background: #f3f4f6;
+}
+
 .label {
     display: block;
     font-size: 12px;
@@ -185,6 +195,10 @@ select {
     opacity: 0.7;
     cursor: not-allowed;
 }  
+
+.primary:hover {
+    background: #1d4ed8;
+}
 
 .small {
     font-size: 12px;
