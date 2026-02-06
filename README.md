@@ -29,6 +29,34 @@ Quickly build and navigate to CCH Gateway return output endpoints.
     -   Version (1--100)
 -   Automatically navigates the current tab to the generated endpoint
 
+### Generate BOT Return Output
+
+Generate return output from BlackOre Integration Center APIs.
+
+-   **Output Types:**
+    -   **CCH Tax Return XML** - Generate XML from preparation data
+    -   **BlackOre Preparation JSON** - Fetch raw preparation JSON
+-   **Input Modes** (for CCH XML output):
+    -   **By Preparation ID** - Use an existing preparation ID
+    -   **Custom Preparation JSON By Return ID** - Build return ID and provide custom JSON
+-   **Advanced JSON Editor:**
+    -   Opens in a separate, resizable popup window
+    -   Syntax highlighting with CodeMirror
+    -   Collapsible JSON sections (fold/unfold)
+    -   Line numbers and bracket matching
+    -   JSON5 support (unquoted keys, trailing commas)
+    -   Format JSON button
+    -   Save & Generate directly from editor
+    -   **Keyboard shortcuts:**
+        -   `Cmd/Ctrl+F` - Search
+        -   `Cmd/Ctrl+G` - Find next
+        -   `Cmd/Ctrl+Shift+G` - Find previous
+        -   `Cmd/Ctrl+H` - Search & Replace
+        -   `Cmd/Ctrl+Z` - Undo
+        -   `Cmd/Ctrl+Shift+Z` - Redo
+        -   `Tab` - Indent
+-   **Add Empty Values** checkbox for XML generation
+
 ### Client ID Typeahead
 
 -   Fetches a default client list on focus
@@ -39,6 +67,7 @@ Quickly build and navigate to CCH Gateway return output endpoints.
 ### Global Settings
 
 -   Configurable **CCH Gateway API Base Path**
+-   Configurable **Integration Center API Base Path**
 -   Global **Entity ID**
 -   Settings persist via `chrome.storage.local`
 
@@ -46,9 +75,10 @@ Quickly build and navigate to CCH Gateway return output endpoints.
 
 ## Why this exists
 
-This tool exists to remove friction from repetitive dev tasks: - No more
-manually crafting return URLs - No more copy/paste between tools -
-Faster iteration when testing APIs (local, QA, etc.)
+This tool exists to remove friction from repetitive dev tasks:
+- No more manually crafting return URLs
+- No more copy/paste between tools
+- Faster iteration when testing APIs (local, QA, etc.)
 
 It's intentionally simple, opinionated, and optimized for daily
 developer use.
@@ -59,19 +89,29 @@ developer use.
 
 1.  Clone the repository:
 
-    ``` bash
+    ```bash
     git clone https://github.com/saharalkolombra-bo/bot-dev-tools-helper.git
+    cd bot-dev-tools-helper
     ```
 
-2.  Open Chrome and navigate to:
+2.  Install dependencies and build:
+
+    ```bash
+    npm install
+    npm run build:editor
+    ```
+
+    This bundles CodeMirror for the JSON editor.
+
+3.  Open Chrome and navigate to:
 
         chrome://extensions
 
-3.  Enable **Developer mode** (top right)
+4.  Enable **Developer mode** (top right)
 
-4.  Click **Load unpacked** and select the project folder
+5.  Click **Load unpacked** and select the project folder
 
-5.  Pin the extension to the toolbar (optional but recommended)
+6.  Pin the extension to the toolbar (optional but recommended)
 
 ------------------------------------------------------------------------
 
@@ -79,8 +119,13 @@ developer use.
 
 Open the extension → click the ⚙️ **Settings** icon.
 
-Required settings: - **CCH Gateway API Base Path** - Examples: -
-`http://localhost:7101` - `https://qa.example.com` - **Entity ID**
+Required settings:
+
+-   **CCH Gateway API Base Path**
+    -   Examples: `http://localhost:7101`, `https://qa.example.com`
+-   **Integration Center API Base Path**
+    -   Examples: `http://localhost:3000`, `https://api.example.com`
+-   **Entity ID**
 
 These values are used by all relevant tools.
 
@@ -106,25 +151,45 @@ are intentional.
     ├─ popup.html
     ├─ popup.js
     ├─ styles.css
+    ├─ json-editor.html         # Separate JSON editor popup
+    ├─ json-editor.js
+    ├─ xml-viewer.html          # XML display helper
+    ├─ xml-viewer.js
+    ├─ package.json             # npm dependencies
     ├─ tools/
-    │  └─ generate-cch-return-output.js
-    ├─ icons/
-    │  └─ *.png
+    │  ├─ generate-cch-return-output.js
+    │  └─ generate-bot-return-output.js
+    ├─ lib/
+    │  ├─ json5.min.js          # JSON5 parser
+    │  ├─ codemirror-bundle.js  # CodeMirror source (dev)
+    │  └─ codemirror.min.js     # CodeMirror bundle (built)
+    └─ icons/
+       └─ *.png
 
 Each tool lives in its own component file to keep logic isolated and
 easy to extend.
 
 ------------------------------------------------------------------------
 
-## Adding New Tools
+## Development
+
+### Rebuilding the Editor
+
+If you modify `lib/codemirror-bundle.js`, rebuild with:
+
+```bash
+npm run build:editor
+```
+
+### Adding New Tools
 
 1.  Create a new tool file under `tools/`
 2.  Export a render function
 3.  Register the tool in the popup router
 4.  Reuse global settings as needed
 
-The architecture is intentionally simple --- no frameworks, no build
-step.
+The architecture is intentionally simple --- no frameworks, minimal
+build step (only for CodeMirror bundling).
 
 ------------------------------------------------------------------------
 

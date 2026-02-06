@@ -11,26 +11,41 @@ const GLOBAL_KEYS = {
     cchGatewayApiBase: "botDevTools.cchGatewayApiBase"
 };
 
+// CodeMirror editor instance
+let editor = null;
+
 document.addEventListener("DOMContentLoaded", async () => {
 
     const els = {
-        customJson: document.getElementById("customJson"),
+        editorContainer: document.getElementById("editorContainer"),
         errorRow: document.getElementById("errorRow"),
         btnFormat: document.getElementById("btnFormat"),
         btnSave: document.getElementById("btnSave"),
         btnGenerate: document.getElementById("btnGenerate")
     };
 
+    // Get editor content
+    function getEditorContent() {
+        return editor ? CM.getContent(editor) : "";
+    }
+
+    // Set editor content
+    function setEditorContent(content) {
+        if (editor) {
+            CM.setContent(editor, content);
+        }
+    }
+
     async function loadSaved() {
         const saved = await chrome.storage.local.get(TOOL_KEYS.customJson);
         const jsonValue = saved[TOOL_KEYS.customJson];
         // Just use whatever is in storage (main tool initializes the default)
-        els.customJson.value = jsonValue || '';
+        return jsonValue || '';
     }
 
     async function saveNow() {
         await chrome.storage.local.set({
-            [TOOL_KEYS.customJson]: els.customJson.value
+            [TOOL_KEYS.customJson]: getEditorContent()
         });
     }
 
@@ -47,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Parse JSON5 and return standard object, or null on error
     function parseJson5(str) {
         try {
-            // JSON5 is loaded globally from CDN
+            // JSON5 is loaded globally
             return JSON5.parse(str);
         } catch (e) {
             showError("Invalid JSON: " + e.message);
@@ -55,20 +70,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Auto-save on input
-    els.customJson.addEventListener("input", () => {
+    // Initialize CodeMirror editor
+    const initialContent = await loadSaved();
+    editor = CM.createJSONEditor(els.editorContainer, initialContent, () => {
         hideError();
         saveNow();
     });
 
     // Format JSON button - parse with JSON5, output as JSON5 (unquoted keys)
     els.btnFormat.onclick = () => {
-        const raw = els.customJson.value.trim();
+        const raw = getEditorContent().trim();
         if (!raw) return;
 
         const parsed = parseJson5(raw);
         if (parsed !== null) {
-            els.customJson.value = JSON5.stringify(parsed, null, 2);
+            setEditorContent(JSON5.stringify(parsed, null, 2));
             hideError();
             saveNow();
         }
@@ -76,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Save & Close button
     els.btnSave.onclick = async () => {
-        const raw = els.customJson.value.trim();
+        const raw = getEditorContent().trim();
 
         // Validate JSON before closing
         if (raw) {
@@ -92,7 +108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     els.btnGenerate.onclick = async () => {
         hideError();
 
-        const raw = els.customJson.value.trim();
+        const raw = getEditorContent().trim();
         if (!raw) {
             showError("JSON is required.");
             return;
@@ -177,26 +193,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                 throw new Error("Server did not return XML: " + errorMsg);
             }
 
-            // Valid XML - store and navigate to viewer (works from any page)
-            await chrome.storage.local.set({ "botDevTools.tempXml": trimmedResponse });
-            
             // Get target tab ID from URL parameter (passed when editor was opened)
             const urlParams = new URLSearchParams(window.location.search);
             const targetTabId = parseInt(urlParams.get("targetTab"), 10);
+
+            // Store XML and navigate to viewer
+            await chrome.storage.local.set({ "botDevTools.tempXml": trimmedResponse });
             
             if (targetTabId) {
                 await chrome.tabs.update(targetTabId, { 
                     url: chrome.runtime.getURL("xml-viewer.html") 
                 });
-                // Focus the window containing that tab
-                const tabInfo = await chrome.tabs.get(targetTabId);
-                if (tabInfo?.windowId) {
-                    await chrome.windows.update(tabInfo.windowId, { focused: true });
-                }
             }
 
-            // Small delay then close
-            setTimeout(() => window.close(), 100);
+            // Reset button state (keep editor open)
+            els.btnGenerate.disabled = false;
+            els.btnGenerate.textContent = "Save & Generate";
         } catch (e) {
             showError("Request failed: " + e.message);
             els.btnGenerate.disabled = false;
@@ -204,26 +216,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    // Handle Tab key in textarea for indentation
-    els.customJson.addEventListener("keydown", (e) => {
-        if (e.key === "Tab") {
-            e.preventDefault();
-            const start = els.customJson.selectionStart;
-            const end = els.customJson.selectionEnd;
-            const value = els.customJson.value;
-
-            // Insert 2 spaces
-            els.customJson.value = value.substring(0, start) + "  " + value.substring(end);
-            els.customJson.selectionStart = els.customJson.selectionEnd = start + 2;
-            saveNow();
-        }
-    });
-
     // Save on window close
     window.addEventListener("beforeunload", () => {
         saveNow();
     });
-
-    // Initialize
-    await loadSaved();
 });

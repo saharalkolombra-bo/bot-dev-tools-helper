@@ -486,6 +486,9 @@ export async function renderGenerateBotReturnOutput(container, ctx) {
             width: 700,
             height: 650
         });
+
+        // Close the main popup so editor stays independent
+        window.close();
     };
 
     // Version blur handler
@@ -600,7 +603,7 @@ export async function renderGenerateBotReturnOutput(container, ctx) {
                     throw new Error("Server did not return XML: " + errorMsg);
                 }
 
-                // Valid XML - store and navigate to viewer (works from any page)
+                // Store XML and navigate to viewer
                 await chrome.storage.local.set({ "botDevTools.tempXml": trimmedResponse });
                 
                 if (targetTabId) {
