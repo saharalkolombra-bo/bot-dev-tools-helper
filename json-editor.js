@@ -21,7 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         errorRow: document.getElementById("errorRow"),
         btnFormat: document.getElementById("btnFormat"),
         btnSave: document.getElementById("btnSave"),
-        btnGenerate: document.getElementById("btnGenerate")
+        btnGenerate: document.getElementById("btnGenerate"),
+        addEmptyValues: document.getElementById("addEmptyValues")
     };
 
     // Get editor content
@@ -37,17 +38,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function loadSaved() {
-        const saved = await chrome.storage.local.get(TOOL_KEYS.customJson);
+        const saved = await chrome.storage.local.get([TOOL_KEYS.customJson, TOOL_KEYS.addEmptyValues]);
         const jsonValue = saved[TOOL_KEYS.customJson];
+        // Load addEmptyValues checkbox state (default to true)
+        els.addEmptyValues.checked = saved[TOOL_KEYS.addEmptyValues] !== false;
         // Just use whatever is in storage (main tool initializes the default)
         return jsonValue || '';
     }
 
     async function saveNow() {
         await chrome.storage.local.set({
-            [TOOL_KEYS.customJson]: getEditorContent()
+            [TOOL_KEYS.customJson]: getEditorContent(),
+            [TOOL_KEYS.addEmptyValues]: els.addEmptyValues.checked
         });
     }
+
+    // Save checkbox state on change
+    els.addEmptyValues.addEventListener("change", saveNow);
 
     function hideError() {
         els.errorRow.style.display = "none";
@@ -145,7 +152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        const addEmptyValues = stored[TOOL_KEYS.addEmptyValues] !== false; // Default true
+        const addEmptyValues = els.addEmptyValues.checked;
 
         // Build URL
         const params = new URLSearchParams({

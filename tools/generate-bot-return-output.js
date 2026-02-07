@@ -85,7 +85,7 @@ export async function renderGenerateBotReturnOutput(container, ctx) {
                 </div>
 
                 <div class="row">
-                    <button type="button" class="toolBtn" id="btnOpenEditor">Open JSON Editor ↗</button>
+                    <button type="button" class="toolBtn" id="btnOpenEditor" style="background:#3b82f6; color:white; border-color:#2563eb;">Open JSON Editor ↗</button>
                 </div>
             </div>
 
@@ -479,9 +479,27 @@ export async function renderGenerateBotReturnOutput(container, ctx) {
         const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
         const targetTabId = currentTab?.id || "";
 
-        // Open the JSON editor in a new popup window, passing the target tab ID
+        // Check if editor window is already open
+        const editorUrl = chrome.runtime.getURL("json-editor.html");
+        const allWindows = await chrome.windows.getAll({ populate: true });
+        
+        for (const win of allWindows) {
+            for (const tab of win.tabs || []) {
+                if (tab.url && tab.url.startsWith(editorUrl)) {
+                    // Editor already open - focus it and update targetTab param
+                    await chrome.windows.update(win.id, { focused: true });
+                    await chrome.tabs.update(tab.id, { 
+                        url: editorUrl + "?targetTab=" + targetTabId 
+                    });
+                    window.close();
+                    return;
+                }
+            }
+        }
+
+        // No editor open - create new window
         chrome.windows.create({
-            url: chrome.runtime.getURL("json-editor.html") + "?targetTab=" + targetTabId,
+            url: editorUrl + "?targetTab=" + targetTabId,
             type: "popup",
             width: 700,
             height: 650
